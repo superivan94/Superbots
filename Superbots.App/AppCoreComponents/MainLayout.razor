@@ -1,0 +1,52 @@
+﻿@inherits LayoutComponentBase
+
+@*Componente che provvede ad applicare il tema*@
+<MudThemeProvider IsDarkMode="_darkModeOn" />
+@*Componente che si occupare dei servizio dialog/alert*@
+<MudDialogProvider />
+@*Le snackbar sono le notifiche di pop-up che di solito compaiono a lato schermo*@
+<MudSnackbarProvider />
+
+<MudLayout Class="d-flex flex-column">
+    <MudAppBar Style="position:relative" Color="Color.Success" Elevation="10">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudToggleIconButton @bind-Toggled="@_darkModeOn"
+                             Icon="@Icons.Material.Filled.DarkMode" Color="@Color.Primary" Title="Off"
+                             ToggledIcon="@Icons.Material.Filled.LightMode" ToggledColor="@Color.Default" ToggledTitle="On" />
+        <MudText Typo="Typo.h5">Superbots</MudText>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Color="Color.Dark" Elevation="20">
+        <MudNavMenu Rounded="true" Margin="Margin.Normal" Color="Color.Tertiary" Class="pa-2" Bordered=true>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/chat" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Message">Chat</MudNavLink>
+            <MudNavGroup Title="Settings">
+                <MudNavLink Href="/authentication" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+                <MudNavLink Href="/security" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">Security</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet">About</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent Class="relative d-flex flex-column pt-0">
+        @Body
+    </MudMainContent>
+
+    <MudAppBar Style="position:relative" ToolBarClass="d-flex gap-4" Bottom="true" Color="Color.Primary" Elevation="10" Dense="true">
+        <MudAvatar Elevation="10">
+            <MudImage Src="img/SporeIcon.png" />
+        </MudAvatar>
+        <MudText>Superivan94</MudText>
+    </MudAppBar>
+</MudLayout>
+
+@code {
+    protected bool _drawerOpen;//TODO finire di implementare
+    protected bool _darkModeOn;
+    public bool DrawerOpen { get => _drawerOpen; }
+    public bool DarkModeOn { get => _darkModeOn; }
+
+    public void DrawerToggle() => _drawerOpen = !_drawerOpen;
+
+    public void DarkModeToggle() => _darkModeOn = !_darkModeOn;
+}

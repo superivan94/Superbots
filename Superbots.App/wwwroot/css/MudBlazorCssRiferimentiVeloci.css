@@ -1,0 +1,41 @@
+﻿/* Documentazione Css MudBlazor: https://mudblazor.com/utilities/display */
+
+d-flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.diocane {
+    background-color:black;
+}

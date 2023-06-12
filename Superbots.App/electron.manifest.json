@@ -1,0 +1,39 @@
+{
+  "executable": "Superbots.App",
+  "splashscreen": {
+    "imageFile": "../../..wwwroot/img/splash.png"
+  },
+  "name": "Superbots.App",
+  "author": "Superivan94",
+  "singleInstance": false,
+  "environment": "Production",
+  "build": {
+    "appId": "com.Superbots.App.app",
+    "productName": "Superbots.App",
+    "copyright": "Copyright © 2023",
+    "buildVersion": "1.0.0",
+    "win": {
+      "target": "NSIS",
+      "icon": "../../../wwwroot/img/AiIcon.png"
+    },
+    "compression": "maximum",
+    "directories": {
+      "output": "../../../bin/Desktop"
+    },
+    "extraResources": [
+      {
+        "from": "./bin",
+        "to": "bin",
+        "filter": [ "**/*" ]
+      }
+    ],
+    "files": [
+      {
+        "from": "./ElectronHostHook/node_modules",
+        "to": "ElectronHostHook/node_modules",
+        "filter": [ "**/*" ]
+      },
+      "**/*"
+    ]
+  }
+}

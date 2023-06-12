@@ -1,0 +1,153 @@
+﻿@page "/chat"
+@using Superbots.App.Features.Chat.Models;
+
+<MudContainer Class="d-flex flex-grow-1" Fixed="true" Style="padding: 1rem;">
+    <MudContainer Class="relative d-flex flex-grow-1" Fixed="true">
+        <MudPaper Class="absolute inset-0 d-flex flex-grow-1 gap-4" Elevation="0">
+            <MudPaper Class="flex-grow-1 d-flex flex-column justify-end pa-4 overflow-y-auto" MinWidth="500px" MinHeight="250px" Elevation="10">
+                <MudList Class="d-flex flex-column overflow-y-auto" Dense="true">
+                    @if (ConversationSelected is not null && ConversationSelected.Messages is not null)
+                    {
+                        <MudButton Class="flex-shrink-0"
+                            Disabled="AllMessagesAreLoaded" 
+                            OnClick="RenderMoreMessages" 
+                            Variant="Variant.Filled" 
+                            Color="Color.Surface">
+                            @if (LoadingMessages)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="mx-2">Caricamento...</MudText>
+                            }
+                            else if (AllMessagesAreLoaded)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CloudDone" />
+                                <MudText Class="mx-2">Tutti i messaggi sono stati caricati!</MudText>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CloudDownload" />
+                                <MudText Class="mx-2">Carica messaggi precedenti...</MudText>
+                            }
+                        </MudButton>
+                        foreach (var message in ConversationSelected.Messages.Skip(MessagesToSkip).TakeLast(MessagesToTakeLast))
+                        {
+                            @* TODO da rivedere il concetto di Autore nei messaggi. Ci possono essere più user?ecc... *@
+                            <MudListItem @key="message.Id" Class="@("zoomInLeft animated duration-sm d-flex" + (message.Author == "User" ? " alt" : ""))">
+                                <MudPaper Class="pa-4" Elevation="10">
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                                        <MudAvatar Elevation="10">
+                                            <MudImage Src="@(message.Author == "User" ? "img/SporeIcon.png" : "img/AiIcon.png")" />
+                                        </MudAvatar>
+                                        <MudText>@message.Content</MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudListItem>
+                        }
+                    }
+                    <div class="reference-to-focus" @ref="MessageListBottom" tabindex="-1"></div>
+                </MudList>
+
+                <div class="d-flex" tabindex="1" @onkeydown="(Func<KeyboardEventArgs, Task>)UserSendMessage">
+                    <MudTextField @ref="UserMessageTextField" Class="mt-0"
+                                  Variant="Variant.Filled"
+                                  Clearable="true"
+                                  Label="@(ConversationSelected is null ? "Select a conversation." : "Your message...")"
+                                  T="string" @bind-Value="@Fields.UserMessage" 
+                                  Immediate="true"
+                                  Disabled="ConversationSelected is null" />
+                    @if (!string.IsNullOrEmpty(Fields.UserMessage) || AiComposingMessage)
+                    {
+                        <MudButton Disabled="@AiComposingMessage" OnClick="UserSendMessage" Variant="Variant.Filled" Color="Color.Surface">
+                            @if (AiComposingMessage)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Send" />
+                            }
+                        </MudButton>
+                    }
+                </div>
+            </MudPaper>
+
+            <MudPaper Class="flex-grow-1 flex-shrink-0 d-flex flex-column overflow-y-auto" MinWidth="250px" MaxWidth="500px" MinHeight="250px" Elevation="10">
+                <MudList>
+                    <MudListItem Class="mud-list-item-full-width">
+                        <MudButton FullWidth="true"
+                                   Size="Size.Large"
+                                   Color="Color.Tertiary"
+                                   Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="CreateConversation">Nuova conversazione</MudButton>
+                    </MudListItem>
+                    @foreach (var conversation in Conversations)
+                    {
+                        <MudListItem Class="mud-list-item-full-width">
+                            <MudButton Class="justify-start"
+                                       FullWidth="true"
+                                       Size="Size.Large"
+                                       Color="GetConversationColor(conversation.Value)"
+                                       Variant="@(ConversationSelected?.Id == conversation.Value.Id ? Variant.Filled : Variant.Text)"
+                                       OnClick="@(() => LoadConversationMessages(conversation.Value))" @ondblclick="@ToggleEditConversationName">
+                                <MudAvatar Class="mx-3" Elevation="3">
+                                    <MudImage Src="img/SporeIcon.png" />
+                                </MudAvatar>
+                                @if (UserWantChangeThisConversationName(conversation.Value))
+                                {
+                                    <MudTextField @key="conversation.Value.Id" @bind-Value="Fields.ConversationName" @onfocusout="@(() => TryToRenameConversation(conversation.Value))"
+                                                  OnKeyDown="@(keyboard => TryToRenameConversation(keyboard, conversation.Value))"
+                                                  Label="@conversation.Value.Name"
+                                                  Immediate="true"
+                                                  Variant="Variant.Filled"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@Icons.Material.Filled.Edit"
+                                                  AdornmentColor="Color.Primary" />
+                                }
+                                else
+                                {
+                                    <MudText>
+                                        @conversation.Value.Name
+                                    </MudText>
+                                }
+                            </MudButton>
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+        </MudPaper>
+    </MudContainer>
+</MudContainer>
+
+<style>
+    /* Region: Fumetto */
+    /* Creato per visualizzare i messaggi che vengono scambiati (fumetto con testo) */
+    /* un messaggio a sinistra e uno a destra per l'altro utente, in questo caso justify-content: end; rende il fumetto allineato a destra. */
+    .alt > :first-child.mud-list-item-text {
+        display: flex;
+        justify-content: end;
+    }
+
+    /* Region: Fumetto */
+    /* Creato per rendere il comportamento del contenitore in modo che "stringa" fino alla dimensione contenuto. */
+    .mud-list-item > :first-child.mud-list-item-text {
+        display: flex;
+    }
+
+    /* Region: Lista */
+    /* Ogni MudListItem ha un tag padre (paragrafo p) che non è flex-grow, quindi non permette al contenuto di occupare */
+    /* tutto lo spazio disponibile. */
+    .mud-list-item-full-width > :first-child.mud-list-item-text > p {
+        flex-grow: 1;
+    }
+</style>
+
+@code
+{
+    private Color GetConversationColor(Conversation conversation)
+    {
+        if (UserWantChangeThisConversationName(conversation)) return Color.Tertiary;
+        else if (ConversationSelected?.Id == conversation.Id) return Color.Primary;
+        else return Color.Default;
+    }
+}

@@ -1,0 +1,27 @@
+﻿html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+.inset-0 {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.w-fit {
+    width: fit-content;
+}
+
+.h-fit {
+    height: fit-content;
+}
+
+/* Serve a mandare in loop le animazioni create con la libreria AniJS */
+.loop {
+    animation-iteration-count: infinite;
+}

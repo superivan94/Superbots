@@ -1,0 +1,79 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace Superbots.App.AppCoreComponents
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+
+    @*
+    Non più necessario con Mudblazor
+
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    *@
+
+    <link type="image/png" href="favicon.png" rel="icon" />
+
+    @* Superbots CSS *@
+    <link href="css/SuperbotsStyle.css" rel="stylesheet" />
+    @* Mudblazor CSS *@
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
+    <!-- AniCollection.css library --> @* TODO *@
+    <link rel="stylesheet" href="https://anijs.github.io/lib/anicollection/anicollection.css">
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+
+<body>
+@*    
+TODO Teoricamente questo è l'animazione di caricamento, ma forse nella versione server non esiste una fase di caricamento. 
+     Provare ad implementare in diverso modo.
+
+    <div id="app">
+        <div class="loading-section">
+            <div class="loader-background">
+                <div class="loader-waves"></div>
+                <div class="loader">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    *@
+    
+
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    @* Mudblazor JS *@
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    @* Aggiunge la libreria per le animazioni AniJS *@
+    <script src="anijs/dist/anijs.js"></script>
+    @* Aggiunge una classe helper per effettuare il detect dello scroll, ma essendo un app con rendering dinamico si hanno comunque problemi *@
+    @* data-anijs="if: click, do: flipInX animated, before: $scrollReveal" *@
+    <script src="anijs/dist/helpers/scrollreveal/anijs-helper-scrollreveal.js"></script>
+</body>
+</html>
