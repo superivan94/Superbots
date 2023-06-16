@@ -1,6 +1,6 @@
 ﻿namespace Superbots.App.Features.Chat.Models
 {
-    public interface IChatServices//TODO rivalutare i nomi, tipo readMessage in realtà restituisce una lista... il nome è ambiguo
+    public interface IChatService
     {
         /// <summary>
         /// Crea una nuova conversazione
@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="conversation">Con Id della conversazione come riferimento è possibile caricare i messaggi</param>
         /// <returns>Restituisce la conversazione con la lista dei messaggi valorizzata</returns>
-        public Task<Conversation> LoadConversation(Conversation conversation);
+        public Task<Conversation> LoadMessagesConversation(Conversation conversation);
 
         /// <summary>
         /// Crea un nuovo messaggio di chat, solitamente al suo interno è contenuta

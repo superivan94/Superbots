@@ -5,13 +5,3 @@
 <h1>Hello, world!</h1>
 
 <div>Welcome to your new app.</div>
-
-@code{
-    [Inject] public IJSRuntime java {get; set; }
-
-    protected async Task BOH()
-    {
-        await java.InvokeAsync<object>("AniJS.init");
-        await java.InvokeAsync<object>("AniJS.run");
-    }
-}

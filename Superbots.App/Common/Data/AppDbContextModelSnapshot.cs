@@ -3,77 +3,77 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Superbots.App.Features.Chat.Models;
+using Superbots.App.Common.Models;
 
 #nullable disable
 
-namespace Superbots.App.Features.Chat.Data
+namespace Superbots.App.Common.Data
 {
-    [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.7");
 
-            modelBuilder.Entity("Conversation", b =>
+            modelBuilder.Entity("ApiKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreationDateTime")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SettingsId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Conversations");
+                    b.HasIndex("SettingsId");
+
+                    b.ToTable("ApiKeys");
                 });
 
-            modelBuilder.Entity("Superbots.App.Features.Chat.Models.Message", b =>
+            modelBuilder.Entity("Settings", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Author")
-                        .IsRequired()
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ConversationId")
+                    b.Property<bool>("Enabled")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConversationId");
-
-                    b.ToTable("Messages");
+                    b.ToTable("Settings");
                 });
 
-            modelBuilder.Entity("Superbots.App.Features.Chat.Models.Message", b =>
+            modelBuilder.Entity("ApiKey", b =>
                 {
-                    b.HasOne("Conversation", null)
-                        .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
+                    b.HasOne("Settings", null)
+                        .WithMany("ApiKeys")
+                        .HasForeignKey("SettingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Conversation", b =>
+            modelBuilder.Entity("Settings", b =>
                 {
-                    b.Navigation("Messages");
+                    b.Navigation("ApiKeys");
                 });
 #pragma warning restore 612, 618
         }

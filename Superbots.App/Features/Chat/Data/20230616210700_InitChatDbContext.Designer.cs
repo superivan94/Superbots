@@ -11,14 +11,14 @@ using Superbots.App.Features.Chat.Models;
 namespace Superbots.App.Features.Chat.Data
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20230528022256_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230616210700_InitChatDbContext")]
+    partial class InitChatDbContext
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.7");
 
             modelBuilder.Entity("Conversation", b =>
                 {

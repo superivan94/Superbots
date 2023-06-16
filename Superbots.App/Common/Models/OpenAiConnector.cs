@@ -1,21 +1,26 @@
-﻿using Microsoft.AspNetCore.Components;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace Superbots.App.Common.Models
 {
     public class OpenAiConnector : IOpenAiConnector<OpenAiConnector>
     {
-        [Inject] private IConfiguration? Configuration { get; }
+        private IConfiguration Configuration { get; }
+        private IAppSettingsService AppSettingsService { get; }
         public HttpClient HttpClient => _httpClient;
         private readonly HttpClient _httpClient;
 
-        public OpenAiConnector(IConfiguration configuration)
+        public OpenAiConnector(IConfiguration configuration, IAppSettingsService appSettingsService)
         {
             Configuration = configuration;
+            AppSettingsService = appSettingsService;
 
             _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new(Configuration["Api:BaseUrl:OpenAi"]!);//Sviluppo: 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   Amici: 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
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "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");
+            _httpClient.BaseAddress = new(Configuration["Api:BaseUrl:OpenAi"]!);
+
+            //TODO migliorare organizzare
+            var key = AppSettingsService.LoadCurrentSettings().Result.ApiKeys.First().Key;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -36,7 +41,7 @@ namespace Superbots.App.Common.Models
 
             var request = new RequestOpenAiChatCompletion()
             {
-                Model = OpenAiModels.GPT3_TURBO,
+                Model = OpenAiModels.GPT3_TURBO_UPDATED,
                 Messages = messages ?? new List<RequestOpenAiChatCompletion.RequestMessage>()
             };
 

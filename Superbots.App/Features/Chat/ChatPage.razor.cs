@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using Superbots.App.Common.Models;
 using Superbots.App.Features.Chat.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Superbots.App.Features.Chat
 {
@@ -21,10 +22,10 @@ namespace Superbots.App.Features.Chat
             EditingConversationName
         }
 
-        [Inject] private ILogger<ChatPage>? Logger { get; set; }
-        [Inject] private IJSRuntime? JSRuntime { get; set; }
-        [Inject] private IChatServices? ChatServices { get; set; }
-        [Inject] private IOpenAiConnector<OpenAiConnector>? OpenAi { get; set; }
+        [Inject][AllowNull] private ILogger<ChatPage> Logger { get; set; }
+        [Inject][AllowNull] private IJSRuntime JSRuntime { get; set; }
+        [Inject][AllowNull] private IChatService ChatServices { get; set; }
+        [Inject][AllowNull] private IOpenAiConnector<OpenAiConnector> OpenAi { get; set; }
 
         private bool UserCanSendMessage => AiComposingMessage is false;
         private bool AiComposingMessage { get; set; }
@@ -54,26 +55,14 @@ namespace Superbots.App.Features.Chat
         {
             await base.OnInitializedAsync();
 
-            await JSRuntime.InvokeAsync<object>("AniJS.init");
-            //data-anijs="if: click, do: flipInX animated, to: .dio"
-
             await LoadConversations();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            //await JSRuntime.InvokeAsync<object>("AniJS.run");
-
-            //await basso.FocusAsync();
         }
 
         private async Task CreateConversation()
         {
             var conversation = new Conversation()
             {
-                Name = $"Nuova conversazione {Random.Shared.Next(100)}",
+                Name = $"Doppio click per rinominare #{Random.Shared.Next(100)}",
                 CreationDateTime = DateTime.Now
             };
             var holdNewConversationId = await ChatServices!.CreateConversation(conversation);
@@ -96,7 +85,7 @@ namespace Superbots.App.Features.Chat
             AllMessagesAreLoaded = false;
             ConversationSelected = conversationToLoad;
 
-            var conversationLoaded = await ChatServices!.LoadConversation(conversationToLoad);
+            var conversationLoaded = await ChatServices!.LoadMessagesConversation(conversationToLoad);
             Conversations[conversationLoaded.Id] = conversationLoaded;
             await RenderMoreMessages();
 
@@ -154,8 +143,14 @@ namespace Superbots.App.Features.Chat
             StateHasChanged();
 
             if (ConversationSelected is null) throw new NullReferenceException();
-            var messages = ConversationSelected.Messages?.Select(m => new RequestOpenAiChatCompletion.RequestMessage() { Role = "user", Content = m.Content });
+            var messages = ConversationSelected.Messages?.Select(m => new RequestOpenAiChatCompletion.RequestMessage() { Role = m.Author == "User" ? "user" : "assistant", Content = m.Content });
             var response = await OpenAi!.ChatCompletion(messages?.ToList());
+
+            Logger.LogDebug($"ChatBotGenerate count {response?.Choices.Count}");
+            foreach (var item in response.Choices)
+            {
+                Logger.LogDebug($"Message {item.Message}");
+            }
 
             await ChatServices!.CreateMessage(new() { Author = "Chatbot", ConversationId = ConversationSelected.Id, CreationDateTime = DateTime.Now, Content = response.Choices.First().Message.Content });
 

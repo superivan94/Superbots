@@ -62,13 +62,14 @@ namespace Superbots.App
             if (HybridSupport.IsElectronActive)
             {
                 var options = new BrowserWindowOptions();
-                options.Width = 1000;
+                options.Width = 1500;
                 options.Height = 1200;
                 options.Icon = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "wwwroot\\img\\AiIcon.png");
                 var window = await Electron.WindowManager.CreateWindowAsync(options);
-                window.WebContents.OpenDevTools();
+                //window.WebContents.OpenDevTools();
             }
-            app.Run();
+
+            await app.RunAsync();
         }
     }
 }

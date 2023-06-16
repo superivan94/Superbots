@@ -25,34 +25,39 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 
-    <!-- AniCollection.css library --> @* TODO *@
-    <link rel="stylesheet" href="https://anijs.github.io/lib/anicollection/anicollection.css">
+    @* MudblazorMarkdown *@
+    @* È un pacchetto non sviluppato direttamente da MudBlazor, ma che si integra con esso. *@
+    <link href="_content/MudBlazor.Markdown/MudBlazor.Markdown.min.css" rel="stylesheet" />
+
+    @* AniCollection.css library *@
+    @* È una collezione di animazioni css *@
+    <link rel="stylesheet" href="~/css/anicollection/dist/anicollection.min.css">
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 
 <body>
-@*    
-TODO Teoricamente questo è l'animazione di caricamento, ma forse nella versione server non esiste una fase di caricamento. 
-     Provare ad implementare in diverso modo.
+    @*
+    TODO Teoricamente questo è l'animazione di caricamento, ma forse nella versione server non esiste una fase di caricamento.
+    Provare ad implementare in diverso modo.
 
     <div id="app">
-        <div class="loading-section">
-            <div class="loader-background">
-                <div class="loader-waves"></div>
-                <div class="loader">
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                </div>
-            </div>
-        </div>
+    <div class="loading-section">
+    <div class="loader-background">
+    <div class="loader-waves"></div>
+    <div class="loader">
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    </div>
+    </div>
+    </div>
     </div>
     *@
-    
+
 
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
@@ -68,12 +73,12 @@ TODO Teoricamente questo è l'animazione di caricamento, ma forse nella versione
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+
     @* Mudblazor JS *@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    @* Aggiunge la libreria per le animazioni AniJS *@
-    <script src="anijs/dist/anijs.js"></script>
-    @* Aggiunge una classe helper per effettuare il detect dello scroll, ma essendo un app con rendering dinamico si hanno comunque problemi *@
-    @* data-anijs="if: click, do: flipInX animated, before: $scrollReveal" *@
-    <script src="anijs/dist/helpers/scrollreveal/anijs-helper-scrollreveal.js"></script>
+
+    @* MudblazorMarkdown *@
+    @* È un pacchetto non sviluppato direttamente da MudBlazor, ma che si integra con esso. *@
+    <script src="_content/MudBlazor.Markdown/MudBlazor.Markdown.min.js"></script>
 </body>
 </html>

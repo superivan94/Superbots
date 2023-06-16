@@ -46,11 +46,17 @@ namespace Superbots.App
 
             builder.Services.AddMudServices();
 
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString("SqLiteApp");
+                options.UseSqlite(connectionString);
+            }).AddScoped<IAppSettingsService, AppSettingsService>();
+
             builder.Services.AddDbContext<ChatDbContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("SqLiteChat");
                 options.UseSqlite(connectionString);
-            }).AddScoped<IChatServices, ChatServices>();
+            }).AddScoped<IChatService, ChatService>();
 
             builder.Services.AddScoped<IOpenAiConnector<OpenAiConnector>, OpenAiConnector>();
             return builder;

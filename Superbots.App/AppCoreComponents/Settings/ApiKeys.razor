@@ -1,0 +1,27 @@
+﻿@page "/apikeysettings"
+@using Superbots.App.Common.Models;
+
+<MudTextField T="string" @bind-Text="@KeyValue" Label="Api Key" Variant="Variant.Filled" />
+<MudButton OnClick="SaveSettings" Variant="Variant.Filled" Color="Color.Surface">Save</MudButton>
+
+@code
+{
+    [Inject] public IAppSettingsService? AppSettingsService { get; set; }
+
+    private string KeyValue { get; set; } = string.Empty;
+
+    private async Task SaveSettings()
+    {
+        var settingsId = await AppSettingsService!.CreateSettings();
+        var settings = await AppSettingsService!.LoadCurrentSettings();
+        var apiKey = new ApiKey()
+            {
+                Name = "ApiKey",
+                Key = KeyValue,
+                Description = "Api Key for the bot"
+            };
+        settings.ApiKeys = new List<ApiKey>() { apiKey };
+        await AppSettingsService!.UpdateSettings(settings);
+        KeyValue = string.Empty;
+    }
+}

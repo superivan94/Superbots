@@ -1,13 +1,13 @@
 ﻿namespace Superbots.App.Features.Chat.Models
 {
-    public class ChatServices : IChatServices
+    public class ChatService : IChatService
     {
         private const string MESSAGE_FORMAT_INVALID_ERROR = "Message properties does not respect constraints!";
         private const string CONVERSATION_FORMAT_INVALID_ERROR = "Conversation properties does not respect constraints!";
 
-        private ChatDbContext db;
+        private readonly ChatDbContext db;
 
-        public ChatServices(ChatDbContext db)
+        public ChatService(ChatDbContext db)
         {
             this.db = db;
         }
@@ -52,7 +52,7 @@
             return await Task.Run(() => db.Conversations.Take(100).OrderByDescending(c => c.CreationDateTime));
         }
 
-        public async Task<Conversation> LoadConversation(Conversation conversation)
+        public async Task<Conversation> LoadMessagesConversation(Conversation conversation)
         {
             return await Task.Run(() =>
             {

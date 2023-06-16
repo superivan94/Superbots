@@ -38,7 +38,7 @@
                                         <MudAvatar Elevation="10">
                                             <MudImage Src="@(message.Author == "User" ? "img/SporeIcon.png" : "img/AiIcon.png")" />
                                         </MudAvatar>
-                                        <MudText>@message.Content</MudText>
+                                        <MudMarkdown Value="@message.Content" />
                                     </MudStack>
                                 </MudPaper>
                             </MudListItem>
