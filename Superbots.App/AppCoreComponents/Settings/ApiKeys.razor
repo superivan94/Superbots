@@ -1,26 +1,55 @@
 ﻿@page "/apikeysettings"
 @using Superbots.App.Common.Models;
 
-<MudTextField T="string" @bind-Text="@KeyValue" Label="Api Key" Variant="Variant.Filled" />
-<MudButton OnClick="SaveSettings" Variant="Variant.Filled" Color="Color.Surface">Save</MudButton>
+<MudContainer Class="d-flex flex-grow-1" Fixed="true" Style="padding: 1rem;">
+    <MudPaper Class="d-flex flex-grow-1 flex-column" Elevation="0">
+        <MudTextField T="string" @bind-Text="@ApiKey.Name" Label="Nome" Variant="Variant.Filled" />
+        <MudTextField T="string" @bind-Text="@ApiKey.Description" Label="Descrizione" Variant="Variant.Filled" />
+        <MudTextField T="string" @bind-Text="@ApiKey.Key" Label="Api Key" Variant="Variant.Filled" />
+        <MudButton OnClick="SaveSettings" Variant="Variant.Filled" Color="Color.Surface">Save</MudButton>
+    </MudPaper>
+</MudContainer>
+
 
 @code
 {
     [Inject] public IAppSettingsService? AppSettingsService { get; set; }
 
     private string KeyValue { get; set; } = string.Empty;
+    private ApiKey ApiKey { get; set; } = new ApiKey();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await AppSettingsService!.LoadCurrentSettings();
+        if (settings is not null)
+        {
+            ApiKey = settings.ApiKeys?.FirstOrDefault() ?? new ApiKey();
+        }
+    }
+
 
     private async Task SaveSettings()
     {
-        var settingsId = await AppSettingsService!.CreateSettings();
         var settings = await AppSettingsService!.LoadCurrentSettings();
-        var apiKey = new ApiKey()
-            {
-                Name = "ApiKey",
-                Key = KeyValue,
-                Description = "Api Key for the bot"
-            };
-        settings.ApiKeys = new List<ApiKey>() { apiKey };
+        if (settings is null)
+        {
+            var settingsId = await AppSettingsService!.CreateSettings();
+            settings = await AppSettingsService!.LoadCurrentSettings();
+        }
+
+        settings!.ApiKeys ??= new List<ApiKey>();
+
+        if (settings.ApiKeys.Any())
+        {
+            settings.ApiKeys.First().Name = ApiKey.Name;
+            settings.ApiKeys.First().Description = ApiKey.Description;
+            settings.ApiKeys.First().Key = ApiKey.Key;
+        }
+        else
+        {
+            settings.ApiKeys.Add(ApiKey);
+        }
+
         await AppSettingsService!.UpdateSettings(settings);
         KeyValue = string.Empty;
     }

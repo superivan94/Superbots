@@ -1,4 +1,4 @@
-﻿namespace Superbots.App.Common.Models
+﻿namespace Superbots.App.Common.Models.OpenAi
 {
     public interface IOpenAiConnector<AiConnector>
     {

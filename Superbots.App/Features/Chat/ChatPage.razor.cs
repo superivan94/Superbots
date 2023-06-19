@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
-using Superbots.App.Common.Models;
+using Superbots.App.Common.Models.OpenAi;
 using Superbots.App.Features.Chat.Models;
 using System.Diagnostics.CodeAnalysis;
 
@@ -44,11 +44,10 @@ namespace Superbots.App.Features.Chat
         public StateValues State { get; set; } = StateValues.Readonly;
         public EditableFields Fields { get; set; } = new();
 
-        //TODO aggiungi un state has changed o qualcosa di simile per far comparire il bottone invia al primo inserimento invece che al focus out
-        //TODO aggiungere controllo di caricare e tenere in memoria solo i messaggi della conversazione attiva
+        //TODO aggiungere controllo di caricare e tenere in memoria solo i messaggi della conversazione attiva, parzialmente implementato
         //TODO inserire delle costanti per definire autore dei messaggi
 
-        private ElementReference MessageListBottom { get; set; }
+        private ElementReference LastMessage { get; set; }
         private MudTextField<string>? UserMessageTextField { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -89,7 +88,7 @@ namespace Superbots.App.Features.Chat
             Conversations[conversationLoaded.Id] = conversationLoaded;
             await RenderMoreMessages();
 
-            await MessageListBottom.FocusAsync();
+            await LastMessage.FocusAsync();
         }
 
         private async Task RenderMoreMessages()
@@ -125,9 +124,9 @@ namespace Superbots.App.Features.Chat
             await UserMessageTextField!.BlurAsync();
 
             MessagesToTakeLast = Math.Clamp(++MessagesToTakeLast, MESSAGES_TO_TAKE_LAST_DEFAULT, MESSAGES_MAX_TO_RENDER);
+            await LastMessage.FocusAsync();
 
-            //TODO bot risponde?
-            await ChatBotGenerate();
+            await ChatBotGenerateResponse();
         }
 
         private async Task UserSendMessage(KeyboardEventArgs eventKeyboard)
@@ -137,13 +136,17 @@ namespace Superbots.App.Features.Chat
             await UserSendMessage();
         }
 
-        private async Task ChatBotGenerate()
+        private async Task ChatBotGenerateResponse()
         {
             AiComposingMessage = true;
             StateHasChanged();
 
             if (ConversationSelected is null) throw new NullReferenceException();
-            var messages = ConversationSelected.Messages?.Select(m => new RequestOpenAiChatCompletion.RequestMessage() { Role = m.Author == "User" ? "user" : "assistant", Content = m.Content });
+            var messages = ConversationSelected.Messages?.Select(m => new RequestOpenAiChatCompletion.RequestMessage()
+            {
+                Role = m.Author == MessageAuthors.USER ? OpenAiRoles.USER : OpenAiRoles.ASSISTANT,
+                Content = m.Content
+            });
             var response = await OpenAi!.ChatCompletion(messages?.ToList());
 
             Logger.LogDebug($"ChatBotGenerate count {response?.Choices.Count}");
@@ -155,7 +158,7 @@ namespace Superbots.App.Features.Chat
             await ChatServices!.CreateMessage(new() { Author = "Chatbot", ConversationId = ConversationSelected.Id, CreationDateTime = DateTime.Now, Content = response.Choices.First().Message.Content });
 
             MessagesToTakeLast = Math.Clamp(++MessagesToTakeLast, MESSAGES_TO_TAKE_LAST_DEFAULT, MESSAGES_MAX_TO_RENDER);
-            await MessageListBottom.FocusAsync();
+            await LastMessage.FocusAsync();
 
             AiComposingMessage = false;
         }

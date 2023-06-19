@@ -1,4 +1,6 @@
-﻿namespace Superbots.App.Common.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Superbots.App.Common.Models
 {
     public class AppSettingsService : IAppSettingsService
     {
@@ -12,16 +14,25 @@
         public async Task<int> CreateSettings()
         {
             var settings = new Settings();
-            db.Settings.First(s => s.Enabled == true).Enabled = false;
+            var oldSettings = db.Settings.FirstOrDefault(s => s.Enabled == true);
+            if (oldSettings != null)
+            {
+                oldSettings.Enabled = false;
+            }
             db.Settings.Add(settings);
             await db.SaveChangesAsync();
 
             return settings.Id;
         }
 
-        public async Task<Settings> LoadCurrentSettings()
+        public async Task<Settings?> LoadCurrentSettings()
         {
-            return await Task.Run(() => db.Settings.First(s => s.Enabled == true));
+            return await Task.Run(() => db.Settings.Include(s => s.ApiKeys).FirstOrDefault(s => s.Enabled == true));
+        }
+
+        public Settings? LoadCurrentSettingsSync()
+        {
+            return db.Settings.Include(s => s.ApiKeys).FirstOrDefault(s => s.Enabled == true);
         }
 
         public async Task<IEnumerable<Settings>> LoadSettings()

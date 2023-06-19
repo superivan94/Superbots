@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 
-namespace Superbots.App.Common.Models
+namespace Superbots.App.Common.Models.OpenAi
 {
     public class OpenAiConnector : IOpenAiConnector<OpenAiConnector>
     {
@@ -18,7 +18,7 @@ namespace Superbots.App.Common.Models
             _httpClient.BaseAddress = new(Configuration["Api:BaseUrl:OpenAi"]!);
 
             //TODO migliorare organizzare
-            var key = AppSettingsService.LoadCurrentSettings().Result.ApiKeys.First().Key;
+            var key = AppSettingsService.LoadCurrentSettingsSync()?.ApiKeys?.First().Key;
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Superbots.App.Common.Models;
+using Superbots.App.Common.Models.OpenAi;
 using Superbots.App.Features.Chat.Models;
 
 namespace Superbots.App
